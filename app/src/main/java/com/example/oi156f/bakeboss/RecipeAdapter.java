@@ -1,6 +1,5 @@
 package com.example.oi156f.bakeboss;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.oi156f.bakeboss.components.Recipe;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by oi156f on 12/8/2017.
@@ -37,6 +37,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Recipe recipe = mRecipes[position];
         holder.recipeTitle.setText(recipe.getName());
+        Picasso.with(mContext)
+                .load(recipe.getImage())
+                .error(R.drawable.image_error)
+                .into(holder.recipeImage);
     }
 
     @Override
