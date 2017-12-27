@@ -32,6 +32,7 @@ public class RecipeDetailFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if(intent.hasExtra("SelectedRecipe")) {
             recipe = intent.getParcelableExtra("SelectedRecipe");
+            getActivity().setTitle(recipe.getName());
             recipeName.setText(recipe.getName());
         }
         return rootView;
