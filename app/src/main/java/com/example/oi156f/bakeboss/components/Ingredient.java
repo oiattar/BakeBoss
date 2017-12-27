@@ -1,12 +1,15 @@
 package com.example.oi156f.bakeboss.components;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
- * Created by oi156f on 12/7/2017.
+ * Created by oi156f on 12/27/2017.
  *
  * Ingredient object
  */
 
-public class Ingredient {
+public class Ingredient implements Parcelable {
 
     private String name;
     private double quantity;
@@ -19,6 +22,12 @@ public class Ingredient {
     }
 
     public Ingredient() {}
+
+    private Ingredient(Parcel source) {
+        name = source.readString();
+        quantity = source.readDouble();
+        measure = source.readString();
+    }
 
     public String getName() {
         return name;
@@ -43,4 +52,28 @@ public class Ingredient {
     public void setMeasure(String measure) {
         this.measure = measure;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(name);
+        parcel.writeDouble(quantity);
+        parcel.writeString(measure);
+    }
+
+    public static final Creator<Ingredient> CREATOR = new Creator<Ingredient>() {
+        @Override
+        public Ingredient createFromParcel(Parcel parcel) {
+            return new Ingredient(parcel);
+        }
+
+        @Override
+        public Ingredient[] newArray(int i) {
+            return new Ingredient[i];
+        }
+    };
 }

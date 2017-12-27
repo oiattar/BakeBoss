@@ -42,5 +42,4 @@ public class RecipeListFragment extends Fragment {
         rvRecipes.setLayoutManager(new LinearLayoutManager(getActivity()));
         return rootView;
     }
-
 }

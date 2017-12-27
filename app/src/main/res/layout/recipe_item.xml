@@ -28,6 +28,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:adjustViewBounds="true"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:src="@mipmap/ic_launcher"
                 android:contentDescription="@string/recipe_image_desc"
                 android:scaleType="centerCrop" />

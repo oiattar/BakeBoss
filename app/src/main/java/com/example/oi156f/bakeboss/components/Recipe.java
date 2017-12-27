@@ -1,12 +1,15 @@
 package com.example.oi156f.bakeboss.components;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by oi156f on 12/7/2017.
  *
  * Recipe object
  */
 
-public class Recipe {
+public class Recipe implements Parcelable {
 
     private int id;
     private String name;
@@ -25,6 +28,16 @@ public class Recipe {
     }
 
     public Recipe() {}
+
+    private Recipe(Parcel source) {
+        id = source.readInt();
+        name = source.readString();
+        ingredients = source.createTypedArray(Ingredient.CREATOR);
+        steps = source.createTypedArray(Step.CREATOR);
+        servings = source.readInt();
+        image = source.readString();
+
+    }
 
     public int getId() {
         return id;
@@ -73,4 +86,31 @@ public class Recipe {
     public void setImage(String image) {
         this.image = image;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(name);
+        parcel.writeTypedArray(ingredients, 0);
+        parcel.writeTypedArray(steps, 0);
+        parcel.writeInt(servings);
+        parcel.writeString(image);
+    }
+
+    public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
+        @Override
+        public Recipe createFromParcel(Parcel parcel) {
+            return new Recipe(parcel);
+        }
+
+        @Override
+        public Recipe[] newArray(int i) {
+            return new Recipe[i];
+        }
+    };
 }

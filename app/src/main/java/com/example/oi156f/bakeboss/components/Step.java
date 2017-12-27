@@ -1,12 +1,15 @@
 package com.example.oi156f.bakeboss.components;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
- * Created by oi156f on 12/7/2017.
+ * Created by oi156f on 12/27/2017.
  *
- * Step object
+ * Step Object
  */
 
-public class Step {
+public class Step implements Parcelable {
 
     private int id;
     private String title;
@@ -23,6 +26,14 @@ public class Step {
     }
 
     public Step() {}
+
+    private Step(Parcel source) {
+        id = source.readInt();
+        title = source.readString();
+        description = source.readString();
+        videoUrl = source.readString();
+        thumbnailUrl = source.readString();
+    }
 
     public int getId() {
         return id;
@@ -63,4 +74,30 @@ public class Step {
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeString(videoUrl);
+        parcel.writeString(thumbnailUrl);
+    }
+
+    public static final Creator<Step> CREATOR = new Creator<Step>() {
+        @Override
+        public Step createFromParcel(Parcel parcel) {
+            return new Step(parcel);
+        }
+
+        @Override
+        public Step[] newArray(int i) {
+            return new Step[i];
+        }
+    };
 }

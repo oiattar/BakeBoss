@@ -1,6 +1,7 @@
 package com.example.oi156f.bakeboss;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
         return mRecipes.length;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView recipeTitle;
         public ImageView recipeImage;
 
@@ -56,6 +57,15 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
             super(itemView);
             recipeTitle = itemView.findViewById(R.id.recipe_title);
             recipeImage = itemView.findViewById(R.id.recipe_image);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Recipe recipe = mRecipes[getAdapterPosition()];
+            Intent intent = new Intent(mContext, RecipeDetailActivity.class);
+            intent.putExtra("SelectedRecipe", recipe);
+            mContext.startActivity(intent);
         }
     }
 }
