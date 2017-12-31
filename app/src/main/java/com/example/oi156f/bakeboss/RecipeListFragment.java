@@ -13,8 +13,15 @@ import com.example.oi156f.bakeboss.utilities.RecipeUtils;
 
 import org.json.JSONException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 public class RecipeListFragment extends Fragment {
 
+    @BindView(R.id.recipe_list) RecyclerView rvRecipes;
+
+    private Unbinder unbinder;
 
     public RecipeListFragment() {
         // Required empty public constructor
@@ -29,7 +36,7 @@ public class RecipeListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recipe_list, container, false);
-        RecyclerView rvRecipes = rootView.findViewById(R.id.recipe_list);
+        unbinder = ButterKnife.bind(this, rootView);
         String recipeJson = RecipeUtils.loadJSONFromAsset(getActivity());
         Recipe[] recipes = null;
         try {
@@ -41,5 +48,11 @@ public class RecipeListFragment extends Fragment {
         rvRecipes.setAdapter(adapter);
         rvRecipes.setLayoutManager(new LinearLayoutManager(getActivity()));
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

@@ -3,6 +3,8 @@ package com.example.oi156f.bakeboss.components;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 /**
  * Created by oi156f on 12/7/2017.
  *
@@ -85,6 +87,15 @@ public class Recipe implements Parcelable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public ArrayList<String> getIngredientsList() {
+        ArrayList<String> ingredientsList = new ArrayList<>();
+        for (Ingredient ing : ingredients) {
+            String ingredientString = Double.toString(ing.getQuantity()) + " " + ing.getMeasure() + " " + ing.getName();
+            ingredientsList.add(ingredientString);
+        }
+        return ingredientsList;
     }
 
     @Override
