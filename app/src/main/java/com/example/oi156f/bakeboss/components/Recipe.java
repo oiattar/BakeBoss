@@ -98,6 +98,15 @@ public class Recipe implements Parcelable {
         return ingredientsList;
     }
 
+    public ArrayList<String> getStepsList() {
+        ArrayList<String> stepsList = new ArrayList<>();
+        for (Step step : steps) {
+            String stepString = step.getTitle();
+            stepsList.add(stepString);
+        }
+        return stepsList;
+    }
+
     @Override
     public int describeContents() {
         return 0;
