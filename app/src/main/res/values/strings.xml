@@ -5,6 +5,9 @@
     <string name="recipe_ingredients_title">Ingredients</string>
     <string name="recipe_steps_title">Directions</string>
 
+    <string name="previous_step_button_desc">Previous Step</string>
+    <string name="next_step_button_desc">Next Step</string>
+
     <string name="selected_recipe_intent_tag">SelectedRecipe</string>
     <string name="selected_step_intent_tag">SelectedStep</string>
 

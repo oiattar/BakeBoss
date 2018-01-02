@@ -2,6 +2,7 @@ package com.example.oi156f.bakeboss;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -45,8 +46,13 @@ public class RecipeDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         Intent intent = getActivity().getIntent();
+        if (savedInstanceState != null) {
+            recipe = savedInstanceState.getParcelable(getString(R.string.selected_recipe_intent_tag));
+        }
         if(intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
             recipe = intent.getParcelableExtra(getString(R.string.selected_recipe_intent_tag));
+        }
+        if (recipe != null) {
             getActivity().setTitle(recipe.getName());
             ArrayAdapter<String> ingredientsAdapter =
                     new ArrayAdapter<>(getContext(), R.layout.ingredients_list_item, recipe.getIngredientsList());
@@ -67,6 +73,12 @@ public class RecipeDetailFragment extends Fragment {
             });
         }
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(getString(R.string.selected_recipe_intent_tag), recipe);
     }
 
     @Override
