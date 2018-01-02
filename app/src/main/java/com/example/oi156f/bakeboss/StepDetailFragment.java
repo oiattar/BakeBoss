@@ -3,6 +3,9 @@ package com.example.oi156f.bakeboss;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.oi156f.bakeboss.components.Recipe;
@@ -52,6 +56,10 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     TextView stepInstruction;
     @BindView(R.id.step_video)
     SimpleExoPlayerView stepVideo;
+    @BindView(R.id.previous_step_button)
+    Button previousButton;
+    @BindView(R.id.next_step_button)
+    Button nextButton;
 
     private SimpleExoPlayer mExoPlayer;
     private MediaSessionCompat mMediaSession;
@@ -75,13 +83,50 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         if(intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
             recipe = intent.getParcelableExtra(getString(R.string.selected_recipe_intent_tag));
             getActivity().setTitle(recipe.getName());
-            int position = intent.getIntExtra(getString(R.string.selected_step_intent_tag), 0);
-            Step[] steps = recipe.getSteps();
+            final int position = intent.getIntExtra(getString(R.string.selected_step_intent_tag), 0);
+            final Step[] steps = recipe.getSteps();
             Step selectedStep = steps[position];
             stepTitle.setText(selectedStep.getTitle());
             stepInstruction.setText(selectedStep.getDescription());
             initializeMediaSession();
             initializePlayer(Uri.parse(selectedStep.getVideoUrl()));
+
+            if (position == 0) {
+                previousButton.setEnabled(false);
+                previousButton.getBackground().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.MULTIPLY);
+            } else {
+                previousButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getContext(), StepDetailActivity.class);
+                        intent.putExtra(getString(R.string.selected_recipe_intent_tag), recipe);
+                        intent.putExtra(getString(R.string.selected_step_intent_tag), position - 1);
+                        getContext().startActivity(intent);
+                        /*Step selectedStep = steps[position - 1];
+                        stepTitle.setText(selectedStep.getTitle());
+                        stepInstruction.setText(selectedStep.getDescription());
+                        initializePlayer(Uri.parse(selectedStep.getVideoUrl()));*/
+                    }
+                });
+            }
+            if (position == steps.length - 1) {
+                nextButton.setEnabled(false);
+                nextButton.getBackground().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.MULTIPLY);
+            } else {
+                nextButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getContext(), StepDetailActivity.class);
+                        intent.putExtra(getString(R.string.selected_recipe_intent_tag), recipe);
+                        intent.putExtra(getString(R.string.selected_step_intent_tag), position + 1);
+                        getContext().startActivity(intent);
+                        /*Step selectedStep = steps[position + 1];
+                        stepTitle.setText(selectedStep.getTitle());
+                        stepInstruction.setText(selectedStep.getDescription());
+                        initializePlayer(Uri.parse(selectedStep.getVideoUrl()));*/
+                    }
+                });
+            }
         }
         return rootView;
     }
