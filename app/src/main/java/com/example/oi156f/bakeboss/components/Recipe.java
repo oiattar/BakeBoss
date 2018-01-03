@@ -92,7 +92,18 @@ public class Recipe implements Parcelable {
     public ArrayList<String> getIngredientsList() {
         ArrayList<String> ingredientsList = new ArrayList<>();
         for (Ingredient ing : ingredients) {
-            String ingredientString = Double.toString(ing.getQuantity()) + " " + ing.getMeasure() + " " + ing.getName();
+            double dquan = ing.getQuantity();
+            String quantity = Double.toString(dquan);;
+            if (dquan == (int) dquan)
+                quantity = Integer.toString((int) dquan);
+
+            String measure = ing.getMeasure() + " ";
+            if (measure.equals("unit "))
+                measure = "";
+            else if(measure.equals("cup ") && dquan > 1)
+                measure = "cups ";
+
+            String ingredientString = quantity + " " + measure + ing.getName();
             ingredientsList.add(ingredientString);
         }
         return ingredientsList;

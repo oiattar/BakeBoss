@@ -46,7 +46,7 @@ import butterknife.Unbinder;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class StepDetailFragment extends Fragment implements ExoPlayer.EventListener {
+public class StepDetailFragment extends Fragment implements ExoPlayer.EventListener, View.OnClickListener {
 
     private static final String TAG = StepDetailFragment.class.getSimpleName();
 
@@ -68,6 +68,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private Unbinder unbinder;
 
     private Recipe recipe = null;
+    int position = 0;
+    private Step[] steps = null;
+    private Step selectedStep = null;
 
     public StepDetailFragment() {
         // Required empty public constructor
@@ -83,52 +86,44 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         if(intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
             recipe = intent.getParcelableExtra(getString(R.string.selected_recipe_intent_tag));
             getActivity().setTitle(recipe.getName());
-            final int position = intent.getIntExtra(getString(R.string.selected_step_intent_tag), 0);
-            final Step[] steps = recipe.getSteps();
-            Step selectedStep = steps[position];
-            stepTitle.setText(selectedStep.getTitle());
-            stepInstruction.setText(selectedStep.getDescription());
+            position = intent.getIntExtra(getString(R.string.selected_step_intent_tag), 0);
+            steps = recipe.getSteps();
+            setupStepDetails();
+            previousButton.setOnClickListener(this);
+            nextButton.setOnClickListener(this);
             initializeMediaSession();
             initializePlayer(Uri.parse(selectedStep.getVideoUrl()));
-
-            if (position == 0) {
-                previousButton.setEnabled(false);
-                previousButton.getBackground().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.MULTIPLY);
-            } else {
-                previousButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), StepDetailActivity.class);
-                        intent.putExtra(getString(R.string.selected_recipe_intent_tag), recipe);
-                        intent.putExtra(getString(R.string.selected_step_intent_tag), position - 1);
-                        getContext().startActivity(intent);
-                        /*Step selectedStep = steps[position - 1];
-                        stepTitle.setText(selectedStep.getTitle());
-                        stepInstruction.setText(selectedStep.getDescription());
-                        initializePlayer(Uri.parse(selectedStep.getVideoUrl()));*/
-                    }
-                });
-            }
-            if (position == steps.length - 1) {
-                nextButton.setEnabled(false);
-                nextButton.getBackground().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.MULTIPLY);
-            } else {
-                nextButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), StepDetailActivity.class);
-                        intent.putExtra(getString(R.string.selected_recipe_intent_tag), recipe);
-                        intent.putExtra(getString(R.string.selected_step_intent_tag), position + 1);
-                        getContext().startActivity(intent);
-                        /*Step selectedStep = steps[position + 1];
-                        stepTitle.setText(selectedStep.getTitle());
-                        stepInstruction.setText(selectedStep.getDescription());
-                        initializePlayer(Uri.parse(selectedStep.getVideoUrl()));*/
-                    }
-                });
-            }
         }
         return rootView;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.previous_step_button)
+            position--;
+        else if (view.getId() == R.id.next_step_button)
+            position++;
+
+        setupStepDetails();
+        releasePlayer();
+        initializePlayer(Uri.parse(selectedStep.getVideoUrl()));
+    }
+
+    private void setupStepDetails() {
+        selectedStep = steps[position];
+        stepTitle.setText(selectedStep.getTitle());
+        stepInstruction.setText(selectedStep.getDescription());
+        changeButtonState(previousButton, position != 0);
+        changeButtonState(nextButton, position != steps.length - 1);
+    }
+
+    private void changeButtonState(Button button, boolean enable) {
+        button.setEnabled(enable);
+        if (enable)
+            button.getBackground().clearColorFilter();
+        else
+            button.getBackground().setColorFilter
+                    (getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.MULTIPLY);
     }
 
     /**

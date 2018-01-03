@@ -78,7 +78,7 @@ public final class RecipeUtils {
             Ingredient ingredient = new Ingredient();
             ingredient.setName(jIngredient.getString(NAME));
             ingredient.setQuantity(jIngredient.getDouble(QUANTITY));
-            ingredient.setMeasure(jIngredient.getString(MEASURE));
+            ingredient.setMeasure(jIngredient.getString(MEASURE).toLowerCase());
             ingredients[i] = ingredient;
         }
 

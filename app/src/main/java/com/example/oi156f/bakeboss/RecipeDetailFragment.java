@@ -4,8 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -14,6 +15,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.example.oi156f.bakeboss.components.Recipe;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,6 +28,7 @@ public class RecipeDetailFragment extends Fragment {
     ListView ingredientsList;
     @BindView(R.id.steps_list)
     ListView stepsList;
+    //@BindView(R.id.bullet_list) TextView bulletList;
 
     private Unbinder unbinder;
 
@@ -54,6 +58,8 @@ public class RecipeDetailFragment extends Fragment {
         }
         if (recipe != null) {
             getActivity().setTitle(recipe.getName());
+            //String list = getBulletList("", recipe.getIngredientsList());
+            //bulletList.setText(list);
             ArrayAdapter<String> ingredientsAdapter =
                     new ArrayAdapter<>(getContext(), R.layout.ingredients_list_item, recipe.getIngredientsList());
             ingredientsList.setAdapter(ingredientsAdapter);
@@ -85,6 +91,24 @@ public class RecipeDetailFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public static String getBulletList(String header, ArrayList<String> items) {
+        final String SPACE = " ";
+        final String BULLET_SYMBOL = "&#8226";
+        final String EOL = System.getProperty("line.separator");
+        final String TAB = "\t";
+        StringBuilder listBuilder = new StringBuilder();
+        if (header != null && !header.isEmpty()) {
+            listBuilder.append(header + EOL + EOL);
+        }
+        if (items != null && items.size() != 0) {
+            for (String item : items) {
+                Spanned formattedItem = Html.fromHtml(BULLET_SYMBOL + SPACE + item);
+                listBuilder.append(TAB + formattedItem + EOL);
+            }
+        }
+        return listBuilder.toString();
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView) {
