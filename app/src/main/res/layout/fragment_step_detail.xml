@@ -6,10 +6,26 @@
     android:layout_height="match_parent"
     tools:context="com.example.oi156f.bakeboss.StepDetailActivity">
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-        android:id="@+id/step_video"
+    <FrameLayout
+        android:id="@+id/video_frame"
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+            android:id="@+id/step_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/step_image"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:visibility="gone"
         android:layout_marginTop="32dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -24,7 +40,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/step_video"
+        app:layout_constraintTop_toBottomOf="@id/video_frame"
         tools:text="Recipe"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
@@ -58,6 +74,7 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:text="@string/next_step_button_desc"
         app:layout_constraintBottom_toBottomOf="@+id/previous_step_button"
         app:layout_constraintEnd_toEndOf="parent"

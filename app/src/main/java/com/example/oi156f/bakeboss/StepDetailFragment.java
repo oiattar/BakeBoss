@@ -1,25 +1,26 @@
 package com.example.oi156f.bakeboss;
 
 
-import android.content.Context;
+import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.res.Configuration;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.oi156f.bakeboss.components.Recipe;
 import com.example.oi156f.bakeboss.components.Step;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -37,6 +38,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,20 +52,33 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
     private static final String TAG = StepDetailFragment.class.getSimpleName();
 
+    private final String STATE_RESUME_WINDOW = "resumeWindow";
+    private final String STATE_RESUME_POSITION = "resumePosition";
+    private final String STATE_PLAYER_FULLSCREEN = "playerFullscreen";
+
     @BindView(R.id.step_title)
     TextView stepTitle;
     @BindView(R.id.step_instruction)
     TextView stepInstruction;
+    @BindView(R.id.video_frame)
+    FrameLayout videoFrame;
     @BindView(R.id.step_video)
     SimpleExoPlayerView stepVideo;
     @BindView(R.id.previous_step_button)
     Button previousButton;
     @BindView(R.id.next_step_button)
     Button nextButton;
+    @BindView(R.id.step_image)
+    ImageView stepImage;
 
     private SimpleExoPlayer mExoPlayer;
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
+    private boolean mExoPlayerFullscreen = false;
+    private Dialog mFullScreenDialog;
+
+    private int mResumeWindow;
+    private long mResumePosition;
 
     private Unbinder unbinder;
 
@@ -71,6 +86,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     int position = 0;
     private Step[] steps = null;
     private Step selectedStep = null;
+    private String videoSource = null;
 
     public StepDetailFragment() {
         // Required empty public constructor
@@ -82,6 +98,13 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
         unbinder = ButterKnife.bind(this, rootView);
+        if (savedInstanceState != null) {
+            mResumeWindow = savedInstanceState.getInt(STATE_RESUME_WINDOW);
+            mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);
+            mExoPlayerFullscreen = savedInstanceState.getBoolean(STATE_PLAYER_FULLSCREEN);
+            selectedStep = savedInstanceState.getParcelable(getString(R.string.selected_step_intent_tag));
+        }
+        initFullscreenDialog();
         Intent intent = getActivity().getIntent();
         if(intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
             recipe = intent.getParcelableExtra(getString(R.string.selected_recipe_intent_tag));
@@ -92,7 +115,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             previousButton.setOnClickListener(this);
             nextButton.setOnClickListener(this);
             initializeMediaSession();
-            initializePlayer(Uri.parse(selectedStep.getVideoUrl()));
+            videoSource = selectedStep.getVideoUrl();
+            initializePlayer(videoSource);
         }
         return rootView;
     }
@@ -105,14 +129,27 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             position++;
 
         setupStepDetails();
-        releasePlayer();
-        initializePlayer(Uri.parse(selectedStep.getVideoUrl()));
+        if (mExoPlayer != null)
+            releasePlayer();
+        initializePlayer(videoSource);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putInt(STATE_RESUME_WINDOW, mResumeWindow);
+        outState.putLong(STATE_RESUME_POSITION, mResumePosition);
+        outState.putBoolean(STATE_PLAYER_FULLSCREEN, mExoPlayerFullscreen);
+        outState.putParcelable(getString(R.string.selected_step_intent_tag), selectedStep);
+
+        super.onSaveInstanceState(outState);
     }
 
     private void setupStepDetails() {
         selectedStep = steps[position];
         stepTitle.setText(selectedStep.getTitle());
         stepInstruction.setText(selectedStep.getDescription());
+        videoSource = selectedStep.getVideoUrl();
         changeButtonState(previousButton, position != 0);
         changeButtonState(nextButton, position != steps.length - 1);
     }
@@ -124,6 +161,52 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         else
             button.getBackground().setColorFilter
                     (getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.MULTIPLY);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            stepTitle.setVisibility(View.GONE);
+            stepInstruction.setVisibility(View.GONE);
+            previousButton.setVisibility(View.GONE);
+            nextButton.setVisibility(View.GONE);
+            openFullscreenDialog();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            stepTitle.setVisibility(View.VISIBLE);
+            stepInstruction.setVisibility(View.VISIBLE);
+            previousButton.setVisibility(View.VISIBLE);
+            nextButton.setVisibility(View.VISIBLE);
+            closeFullscreenDialog();
+        }
+    }
+
+    private void initFullscreenDialog() {
+
+        mFullScreenDialog = new Dialog(getActivity(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            public void onBackPressed() {
+                if (mExoPlayerFullscreen)
+                    closeFullscreenDialog();
+                super.onBackPressed();
+            }
+        };
+    }
+
+    private void openFullscreenDialog() {
+
+        ((ViewGroup) stepVideo.getParent()).removeView(stepVideo);
+        mFullScreenDialog.addContentView(stepVideo, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mExoPlayerFullscreen = true;
+        mFullScreenDialog.show();
+    }
+
+
+    private void closeFullscreenDialog() {
+
+        ((ViewGroup) stepVideo.getParent()).removeView(stepVideo);
+        videoFrame.addView(stepVideo);
+        mExoPlayerFullscreen = false;
+        mFullScreenDialog.dismiss();
     }
 
     /**
@@ -164,10 +247,19 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
     /**
      * Initialize ExoPlayer.
-     * @param mediaUri The URI of the sample to play.
+     * @param videoSource The URL of the sample to play.
      */
-    private void initializePlayer(Uri mediaUri) {
-        if (mExoPlayer == null) {
+    private void initializePlayer(String videoSource) {
+        if (videoSource.isEmpty()) {
+            Picasso.with(getActivity())
+                    .load(selectedStep.getThumbnailUrl())
+                    .error(R.drawable.image_error)
+                    .into(stepImage);
+            videoFrame.setVisibility(View.INVISIBLE);
+            stepImage.setVisibility(View.VISIBLE);
+        } else if (mExoPlayer == null) {
+            videoFrame.setVisibility(View.VISIBLE);
+            stepImage.setVisibility(View.GONE);
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
@@ -175,10 +267,15 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             stepVideo.setPlayer(mExoPlayer);
 
             mExoPlayer.addListener(this);
+            boolean haveResumePosition = mResumeWindow != C.INDEX_UNSET;
+
+            if (haveResumePosition) {
+                stepVideo.getPlayer().seekTo(mResumeWindow, mResumePosition);
+            }
 
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(getActivity(), "BakeBoss");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(videoSource), new DefaultDataSourceFactory(
                     getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
@@ -192,6 +289,41 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         mExoPlayer.stop();
         mExoPlayer.release();
         mExoPlayer = null;
+    }
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+
+        if (stepVideo == null) {
+            initFullscreenDialog();
+        }
+
+        initializePlayer(videoSource);
+
+        if (mExoPlayerFullscreen) {
+            ((ViewGroup) stepVideo.getParent()).removeView(stepVideo);
+            mFullScreenDialog.addContentView(stepVideo, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            mFullScreenDialog.show();
+        }
+    }
+
+
+    @Override
+    public void onPause() {
+
+        super.onPause();
+
+        if (stepVideo != null && stepVideo.getPlayer() != null) {
+            mResumeWindow = stepVideo.getPlayer().getCurrentWindowIndex();
+            mResumePosition = Math.max(0, stepVideo.getPlayer().getCurrentPosition());
+
+            stepVideo.getPlayer().release();
+        }
+
+        if (mFullScreenDialog != null)
+            mFullScreenDialog.dismiss();
     }
 
     @Override
