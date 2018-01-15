@@ -87,6 +87,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private Step[] steps = null;
     private Step selectedStep = null;
     private String videoSource = null;
+    private boolean mTwoPane = false;
 
     public StepDetailFragment() {
         // Required empty public constructor
@@ -106,10 +107,12 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         }
         initFullscreenDialog();
         Intent intent = getActivity().getIntent();
-        if(intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
+        if(!mTwoPane && intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
             recipe = intent.getParcelableExtra(getString(R.string.selected_recipe_intent_tag));
             getActivity().setTitle(recipe.getName());
             position = intent.getIntExtra(getString(R.string.selected_step_intent_tag), 0);
+        }
+        if (recipe != null) {
             steps = recipe.getSteps();
             setupStepDetails();
             previousButton.setOnClickListener(this);
@@ -154,6 +157,10 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         changeButtonState(nextButton, position != steps.length - 1);
     }
 
+    public void setTwoPane(boolean twoPane) {
+        mTwoPane = twoPane;
+    }
+
     private void changeButtonState(Button button, boolean enable) {
         button.setEnabled(enable);
         if (enable)
@@ -161,6 +168,14 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         else
             button.getBackground().setColorFilter
                     (getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.MULTIPLY);
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     @Override
@@ -335,7 +350,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        releasePlayer();
+        if (mExoPlayer != null)
+            releasePlayer();
         mMediaSession.setActive(false);
     }
 

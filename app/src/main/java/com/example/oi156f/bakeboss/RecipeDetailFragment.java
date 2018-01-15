@@ -1,5 +1,6 @@
 package com.example.oi156f.bakeboss;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,6 +34,8 @@ public class RecipeDetailFragment extends Fragment {
     private Unbinder unbinder;
 
     private Recipe recipe = null;
+
+    OnStepClickListener mCallback;
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -70,15 +73,26 @@ public class RecipeDetailFragment extends Fragment {
             setListViewHeightBasedOnChildren(stepsList);
             stepsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Intent intent = new Intent(getContext(), StepDetailActivity.class);
-                    intent.putExtra(getString(R.string.selected_recipe_intent_tag), recipe);
-                    intent.putExtra(getString(R.string.selected_step_intent_tag), i);
-                    getContext().startActivity(intent);
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    mCallback.onStepSelected(recipe, position);
                 }
             });
         }
         return rootView;
+    }
+
+    public interface OnStepClickListener {
+        void onStepSelected(Recipe recipe, int position);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (OnStepClickListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement OnStepClickListener");
+        }
     }
 
     @Override
