@@ -10,5 +10,8 @@
 
     <string name="selected_recipe_intent_tag">SelectedRecipe</string>
     <string name="selected_step_intent_tag">SelectedStep</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>
