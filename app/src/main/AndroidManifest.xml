@@ -6,9 +6,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/launcher_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/launcher_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".RecipeListActivity">
@@ -35,7 +35,7 @@
                 android:value=".RecipeDetailActivity" />
         </activity>
 
-        <receiver android:name=".RecipeWidgetProvider">
+        <receiver android:name=".widget.RecipeWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -45,11 +45,14 @@
                 android:resource="@xml/recipe_widget_info" />
         </receiver>
 
-        <activity android:name=".RecipeWidgetProviderConfigureActivity">
+        <activity android:name=".widget.RecipeWidgetProviderConfigureActivity">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
+
+        <service android:name=".widget.RecipeWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

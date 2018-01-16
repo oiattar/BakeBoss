@@ -1,6 +1,7 @@
 package com.example.oi156f.bakeboss.utilities;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.example.oi156f.bakeboss.components.Ingredient;
 import com.example.oi156f.bakeboss.components.Recipe;
@@ -21,10 +22,10 @@ import java.io.InputStream;
 
 public final class RecipeUtils {
 
-    public static String loadJSONFromAsset(Activity activity) {
+    public static String loadJSONFromAsset(Context context) {
         String json = null;
         try {
-            InputStream is = activity.getAssets().open("bakingrecipes.json");
+            InputStream is = context.getAssets().open("bakingrecipes.json");
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);

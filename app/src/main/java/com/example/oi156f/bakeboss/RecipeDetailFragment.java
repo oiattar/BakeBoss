@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,9 +56,11 @@ public class RecipeDetailFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (savedInstanceState != null) {
             recipe = savedInstanceState.getParcelable(getString(R.string.selected_recipe_intent_tag));
+            Log.d("OMAR", "from saved");
         }
         if(intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
             recipe = intent.getParcelableExtra(getString(R.string.selected_recipe_intent_tag));
+            Log.d("OMAR", "from intent: " + recipe.getName());
         }
         if (recipe != null) {
             getActivity().setTitle(recipe.getName());

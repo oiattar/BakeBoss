@@ -6,22 +6,26 @@
     android:padding="16dp">
 
     <TextView
+        android:id="@+id/widget_config_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/configure" />
+        android:text="@string/app_name"
+        android:textColor="@android:color/black"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-    <EditText
-        android:id="@+id/appwidget_text"
+    <TextView
+        android:id="@+id/widget_config_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text" />
-
-    <Button
-        android:id="@+id/add_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/add_widget" />
+        android:text="@string/configure"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <ListView
+        android:id="@+id/recipe_select_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
