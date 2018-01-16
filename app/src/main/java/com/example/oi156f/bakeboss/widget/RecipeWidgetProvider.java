@@ -40,7 +40,6 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
         views.setRemoteAdapter(R.id.widget_ingredients_list, listIntent);
 
         int position = RecipeWidgetProviderConfigureActivity.loadPosPref(context, appWidgetId);
-        Log.d("OMAR", "recipePosition: " + Integer.toString(position));
         String recipeJson = RecipeUtils.loadJSONFromAsset(context);
         Recipe[] recipes = null;
         try {
@@ -49,12 +48,10 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
             e.printStackTrace();
         }
         Recipe recipe = recipes[position];
-        Log.d("OMAR", "recipeName: " + recipe.getName());
         Intent launchIntent = new Intent(context, RecipeDetailActivity.class);
         launchIntent.putExtra(context.getString(R.string.selected_recipe_intent_tag), recipe);
         Recipe rec = launchIntent.getParcelableExtra(context.getString(R.string.selected_recipe_intent_tag));
-        Log.d("OMAR", "recName: " + rec.getName());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widget_linear_layout, pendingIntent);
 
         // Instruct the widget manager to update the widget
