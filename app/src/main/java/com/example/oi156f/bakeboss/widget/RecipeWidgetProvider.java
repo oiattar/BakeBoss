@@ -41,13 +41,14 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
 
         int position = RecipeWidgetProviderConfigureActivity.loadPosPref(context, appWidgetId);
         String recipeJson = RecipeUtils.loadJSONFromAsset(context);
-        Recipe[] recipes = null;
+        Recipe[] recipes;
+        Recipe recipe = null;
         try {
             recipes = RecipeUtils.getRecipesFromJson(recipeJson);
+            recipe = recipes[position];
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Recipe recipe = recipes[position];
         Intent launchIntent = new Intent(context, RecipeDetailActivity.class);
         launchIntent.putExtra(context.getString(R.string.selected_recipe_intent_tag), recipe);
         Recipe rec = launchIntent.getParcelableExtra(context.getString(R.string.selected_recipe_intent_tag));
