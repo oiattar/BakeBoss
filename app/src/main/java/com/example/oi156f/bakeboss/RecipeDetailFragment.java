@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.oi156f.bakeboss.adapters.IngredientsAdapter;
+import com.example.oi156f.bakeboss.adapters.StepsAdapter;
 import com.example.oi156f.bakeboss.components.Recipe;
 
 import butterknife.BindView;

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.oi156f.bakeboss.adapters.RecipeAdapter;
 import com.example.oi156f.bakeboss.components.Recipe;
 import com.example.oi156f.bakeboss.utilities.RecipeUtils;
 
@@ -18,10 +19,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class RecipeListFragment extends Fragment {
-
-    @BindView(R.id.recipe_list) RecyclerView rvRecipes;
-
-    private Unbinder unbinder;
 
     public RecipeListFragment() {
         // Required empty public constructor
@@ -36,30 +33,7 @@ public class RecipeListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recipe_list, container, false);
-        unbinder = ButterKnife.bind(this, rootView);
-        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
-        int numColumns;
-        if (isTablet) { //it's a tablet
-            numColumns = 3;
-        } else { //it's a phone, not a tablet
-            numColumns = 1;
-        }
-        String recipeJson = RecipeUtils.loadJSONFromAsset(getActivity());
-        Recipe[] recipes = null;
-        try {
-            recipes = RecipeUtils.getRecipesFromJson(recipeJson);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        RecipeAdapter adapter = new RecipeAdapter(getActivity(), recipes);
-        rvRecipes.setAdapter(adapter);
-        rvRecipes.setLayoutManager(new GridLayoutManager(getActivity(), numColumns));
+        new FetchRecipesTask(getActivity(), rootView).execute();
         return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 }

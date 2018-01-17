@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.example.oi156f.bakeboss.components.Recipe;
 import com.example.oi156f.bakeboss.components.Step;
+import com.example.oi156f.bakeboss.utilities.RecipeUtils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -266,8 +267,11 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
      */
     private void initializePlayer(String videoSource) {
         if (videoSource.isEmpty()) {
+            String imageUrl = selectedStep.getThumbnailUrl();
+            if (imageUrl.isEmpty())
+                imageUrl = RecipeUtils.NO_VIDEO_URL;
             Picasso.with(getActivity())
-                    .load(selectedStep.getThumbnailUrl())
+                    .load(imageUrl)
                     .error(R.drawable.image_error)
                     .into(stepImage);
             videoFrame.setVisibility(View.INVISIBLE);

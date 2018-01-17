@@ -1,4 +1,4 @@
-package com.example.oi156f.bakeboss;
+package com.example.oi156f.bakeboss.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.oi156f.bakeboss.R;
+import com.example.oi156f.bakeboss.RecipeDetailActivity;
 import com.example.oi156f.bakeboss.components.Recipe;
 import com.squareup.picasso.Picasso;
 

@@ -1,6 +1,7 @@
 package com.example.oi156f.bakeboss.utilities;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.example.oi156f.bakeboss.components.Ingredient;
 import com.example.oi156f.bakeboss.components.Recipe;
@@ -12,6 +13,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Scanner;
 
 /**
  * Created by oi156f on 12/7/2017.
@@ -20,6 +25,16 @@ import java.io.InputStream;
  */
 
 public final class RecipeUtils {
+
+    public static final String RECIPE_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
+
+    public static final String NO_VIDEO_URL = "https://i.imgur.com/pi0OsD7.jpg";
+
+    public static String[] imageURLS = {
+                        "https://i.imgur.com/fX9XwDN.png",
+                        "http://food.fnr.sndimg.com/content/dam/images/food/fullset/2016/2/18/1/FNK_Brownie-Guide-Classic-Brownies_s4x3.jpg.rend.hgtvcom.616.462.suffix/1456176242492.jpeg",
+                        "http://d3cizcpymoenau.cloudfront.net/images/28462/SFS_yellow_layer_cake-195.jpg",
+                        "https://i.imgur.com/D3BSS8q.jpg"};
 
     public static String loadJSONFromAsset(Context context) {
         String json = null;
@@ -107,5 +122,51 @@ public final class RecipeUtils {
         }
 
         return steps;
+    }
+
+    /**
+     * Builds the URL used to talk to the movie database
+     *
+     * @return The URL to use to query the recipes
+     */
+    public static URL buildUrl() {
+
+        Uri builtUri = Uri.parse(RECIPE_URL).buildUpon().build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+
+    /**
+     * This method returns the entire result from the HTTP response.
+     *
+     * @param url The URL to fetch the HTTP response from.
+     * @return The contents of the HTTP response.
+     * @throws IOException Related to network and stream reading
+     */
+    public static String getResponseFromHttpUrl(URL url) throws IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        try {
+            InputStream in = urlConnection.getInputStream();
+
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\\A");
+
+            boolean hasInput = scanner.hasNext();
+            if (hasInput) {
+                return scanner.next();
+            } else {
+                return null;
+            }
+        } finally {
+            urlConnection.disconnect();
+        }
     }
 }

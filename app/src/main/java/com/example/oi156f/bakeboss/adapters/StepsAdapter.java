@@ -1,4 +1,4 @@
-package com.example.oi156f.bakeboss;
+package com.example.oi156f.bakeboss.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
