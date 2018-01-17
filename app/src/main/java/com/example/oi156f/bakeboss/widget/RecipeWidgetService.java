@@ -1,8 +1,6 @@
 package com.example.oi156f.bakeboss.widget;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViewsService;
 
 /**

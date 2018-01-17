@@ -6,19 +6,14 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.RemoteViews;
 
 import com.example.oi156f.bakeboss.R;
 import com.example.oi156f.bakeboss.RecipeDetailActivity;
 import com.example.oi156f.bakeboss.components.Recipe;
 import com.example.oi156f.bakeboss.utilities.RecipeUtils;
-import com.google.gson.Gson;
 
 import org.json.JSONException;
-
-import java.util.Arrays;
 
 /**
  * Implementation of App Widget functionality.

@@ -1,6 +1,5 @@
 package com.example.oi156f.bakeboss.utilities;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.example.oi156f.bakeboss.components.Ingredient;

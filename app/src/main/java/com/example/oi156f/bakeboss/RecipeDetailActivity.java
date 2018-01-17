@@ -20,7 +20,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
 
-        if(findViewById(R.id.recipe_linear_layout) != null) {
+        if(getResources().getBoolean(R.bool.isTablet)) {
             mTwoPane = true;
 
             if(intent.hasExtra(getString(R.string.selected_recipe_intent_tag))) {
