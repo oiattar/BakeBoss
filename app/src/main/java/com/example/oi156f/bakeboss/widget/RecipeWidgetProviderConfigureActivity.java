@@ -11,19 +11,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.oi156f.bakeboss.FetchRecipesTask;
 import com.example.oi156f.bakeboss.R;
 import com.example.oi156f.bakeboss.components.Recipe;
-import com.example.oi156f.bakeboss.utilities.RecipeUtils;
 import com.google.gson.Gson;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 
 /**
  * The configuration screen for the {@link RecipeWidgetProvider RecipeWidgetProvider} AppWidget.
  */
-public class RecipeWidgetProviderConfigureActivity extends Activity {
+public class RecipeWidgetProviderConfigureActivity extends Activity implements FetchRecipesTask.OnTaskCompleted {
 
     private static final String PREFS_NAME = "com.example.oi156f.bakeboss.widget.RecipeWidgetProvider";
     private static final String POSITION_KEY = "position_";
@@ -47,14 +45,25 @@ public class RecipeWidgetProviderConfigureActivity extends Activity {
         setContentView(R.layout.recipe_widget_configure);
         recipeList = findViewById(R.id.recipe_select_list);
 
-        String recipeJson = RecipeUtils.loadJSONFromAsset(this);
-        Recipe[] rec = null;
-        try {
-            rec = RecipeUtils.getRecipesFromJson(recipeJson);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        new FetchRecipesTask(this).execute();
+
+        // Find the widget id from the intent.
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            mAppWidgetId = extras.getInt(
+                    AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         }
-        final Recipe[] recipes = rec;
+
+        // If this activity was started with an intent without an app widget ID, finish with an error.
+        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            finish();
+            return;
+        }
+    }
+
+    @Override
+    public void onTaskCompleted(final Recipe[] recipes) {
         ArrayList<String> recipeNames = new ArrayList<>();
         for (Recipe recipe : recipes) {
             recipeNames.add(recipe.getName());
@@ -82,20 +91,6 @@ public class RecipeWidgetProviderConfigureActivity extends Activity {
                 finish();
             }
         });
-
-        // Find the widget id from the intent.
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            mAppWidgetId = extras.getInt(
-                    AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        }
-
-        // If this activity was started with an intent without an app widget ID, finish with an error.
-        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-            finish();
-            return;
-        }
     }
 
     // Write the prefix to the SharedPreferences object for this widget

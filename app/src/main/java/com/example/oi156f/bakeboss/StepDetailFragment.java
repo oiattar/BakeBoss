@@ -56,6 +56,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private final String STATE_RESUME_WINDOW = "resumeWindow";
     private final String STATE_RESUME_POSITION = "resumePosition";
     private final String STATE_PLAYER_FULLSCREEN = "playerFullscreen";
+    private final String STATE_PLAY_READY = "playWhenReady";
 
     @BindView(R.id.step_title)
     TextView stepTitle;
@@ -89,6 +90,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private Step selectedStep = null;
     private String videoSource = null;
     private boolean mTwoPane = false;
+    private boolean playWhenReady = true;
 
     public StepDetailFragment() {
         // Required empty public constructor
@@ -105,6 +107,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);
             mExoPlayerFullscreen = savedInstanceState.getBoolean(STATE_PLAYER_FULLSCREEN);
             selectedStep = savedInstanceState.getParcelable(getString(R.string.selected_step_intent_tag));
+            mExoPlayer.setPlayWhenReady(savedInstanceState.getBoolean(STATE_PLAY_READY));
         }
         initFullscreenDialog();
         Intent intent = getActivity().getIntent();
@@ -144,6 +147,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         outState.putInt(STATE_RESUME_WINDOW, mResumeWindow);
         outState.putLong(STATE_RESUME_POSITION, mResumePosition);
         outState.putBoolean(STATE_PLAYER_FULLSCREEN, mExoPlayerFullscreen);
+        outState.putBoolean(STATE_PLAY_READY, playWhenReady);
         outState.putParcelable(getString(R.string.selected_step_intent_tag), selectedStep);
 
         super.onSaveInstanceState(outState);
@@ -337,6 +341,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         if (stepVideo != null && stepVideo.getPlayer() != null) {
             mResumeWindow = stepVideo.getPlayer().getCurrentWindowIndex();
             mResumePosition = Math.max(0, stepVideo.getPlayer().getCurrentPosition());
+            playWhenReady = stepVideo.getPlayer().getPlayWhenReady();
 
             stepVideo.getPlayer().release();
         }

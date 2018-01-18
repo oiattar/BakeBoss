@@ -3,10 +3,9 @@ package com.example.oi156f.bakeboss;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ListView;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 
 import org.hamcrest.Description;
@@ -25,7 +24,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
@@ -75,9 +73,7 @@ public class BakeBossTest {
         onView(withRecyclerView(R.id.recipe_list).atPosition(1)).perform(click());
 
         // click second step in Brownies steps list
-        onData(anything()).inAdapterView(withId(R.id.steps_list))
-                .atPosition(1)
-                .perform(click());
+        onView(withRecyclerView(R.id.steps_list).atPosition(1)).perform(click());
 
         // verify the second step details are displayed, image instead of video
         onView(withId(R.id.step_title)).check(matches(withText("Starting prep")));
@@ -101,11 +97,11 @@ public class BakeBossTest {
     public static Matcher<View> withListSize (final int size) {
         return new TypeSafeMatcher<View> () {
             @Override public boolean matchesSafely (final View view) {
-                return ((ListView) view).getChildCount () == size;
+                return ((RecyclerView) view).getChildCount () == size;
             }
 
             @Override public void describeTo (final Description description) {
-                description.appendText ("ListView should have " + size + " items");
+                description.appendText ("RecyclerView should have " + size + " items");
             }
         };
     }
