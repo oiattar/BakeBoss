@@ -107,7 +107,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);
             mExoPlayerFullscreen = savedInstanceState.getBoolean(STATE_PLAYER_FULLSCREEN);
             selectedStep = savedInstanceState.getParcelable(getString(R.string.selected_step_intent_tag));
-            mExoPlayer.setPlayWhenReady(savedInstanceState.getBoolean(STATE_PLAY_READY));
+            playWhenReady = savedInstanceState.getBoolean(STATE_PLAY_READY);
         }
         initFullscreenDialog();
         Intent intent = getActivity().getIntent();
