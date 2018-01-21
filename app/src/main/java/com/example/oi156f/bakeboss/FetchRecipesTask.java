@@ -33,7 +33,8 @@ public class FetchRecipesTask extends AsyncTask<Void, Void, Recipe[]> {
     @Override
     protected void onPostExecute(Recipe[] recipes) {
         for (int i = 0; i < recipes.length; i++) {
-            recipes[i].setImage(RecipeUtils.imageURLS[i]);
+            if (recipes[i].getImage().isEmpty())
+                recipes[i].setImage(RecipeUtils.imageURLS[i]);
         }
         onTaskCompleted.onTaskCompleted(recipes);
     }
